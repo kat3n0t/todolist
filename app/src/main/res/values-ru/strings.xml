@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="save">Сохранить</string>
+    <string name="delete">Удалить</string>
+
+    <string name="action_show_completed">Показать выполненные</string>
+    <string name="action_hide_completed">Скрыть выполненные</string>
+
+    <string name="note">Заметка</string>
+    <string name="new_note">Новая заметка</string>
+    <string name="notes_text">Текст заметки</string>
+
+    <string name="complete_execute">Завершить/Выполнить</string>
+</resources>

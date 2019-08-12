@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name" translatable="false">Todo List</string>
+
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+
+    <string name="action_show_completed">Show completed</string>
+    <string name="action_hide_completed">Hide completed</string>
+
+    <string name="note">Note</string>
+    <string name="new_note">New Note</string>
+    <string name="notes_text">Notes text</string>
+
+    <string name="complete_execute">Execute</string>
+</resources>
