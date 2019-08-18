@@ -11,4 +11,5 @@
     <string name="notes_text">Текст заметки</string>
 
     <string name="complete_execute">Завершить/Выполнить</string>
+    <string name="notification">Уведомление</string>
 </resources>

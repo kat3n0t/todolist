@@ -10,6 +10,7 @@ import com.todolist.interfaces.INoteView
 import com.todolist.mvp.presenters.EditNotePresenter
 import com.todolist.mvp.presenters.NewNotePresenter
 import kotlinx.android.synthetic.main.activity_note.*
+import java.lang.Exception
 
 class NoteActivity : AppCompatActivity(), INoteView {
 
@@ -25,8 +26,6 @@ class NoteActivity : AppCompatActivity(), INoteView {
         }
 
         setButtonListeners()
-
-        // TODO: Добавить напоминание
     }
 
     override fun onStart() {
@@ -50,6 +49,16 @@ class NoteActivity : AppCompatActivity(), INoteView {
         editText_note.setText(text)
     }
 
+    override fun setImageButtonType(type: Int) {
+        try {
+            imageButton_notification.setImageResource(type)
+            imageButton_notification.visibility = View.VISIBLE
+        }
+        catch(e: Exception) {
+            imageButton_notification.visibility = View.GONE
+        }
+    }
+
     override fun showDeleteButton(isShow: Boolean) {
         if (!isShow)
             btn_delete.visibility = View.GONE
@@ -61,6 +70,9 @@ class NoteActivity : AppCompatActivity(), INoteView {
         }
         btn_delete.setOnClickListener {
             (notePresenter as? IEditNotePresenter)?.onDeleteClick()
+        }
+        imageButton_notification.setOnClickListener {
+            (notePresenter as? IEditNotePresenter)?.onNotificationClick(true) // TODO
         }
     }
 

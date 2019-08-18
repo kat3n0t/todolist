@@ -11,5 +11,6 @@
     <string name="new_note">New Note</string>
     <string name="notes_text">Notes text</string>
 
+    <string name="notification">Notification</string>
     <string name="complete_execute">Execute</string>
 </resources>

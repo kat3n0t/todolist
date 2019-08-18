@@ -28,14 +28,15 @@ class NotesAdapter(private val context: Context, private val notesSet: LinkedHas
         holder.bind(notesSet.elementAt(position))
     }
 
-    inner class NotesViewHolder(itemView: View, private val presenter: INotesPresenter) : RecyclerView.ViewHolder(itemView) {
+    inner class NotesViewHolder(itemView: View, private val presenter: INotesPresenter) :
+        RecyclerView.ViewHolder(itemView) {
 
         private val listItemNoteView: CheckBox = itemView.findViewById(R.id.checkBox_note)
 
         fun bind(note: Note) {
             setItemStyle(listItemNoteView, note)
 
-            listItemNoteView.setOnLongClickListener{
+            listItemNoteView.setOnLongClickListener {
                 presenter.onItemLongClicked(listItemNoteView, note)
                 true
             }
