@@ -42,8 +42,7 @@ class MainActivity : AppCompatActivity(), IMainView {
     }
 
     override fun fillRecyclerView(notesSet: LinkedHashSet<Note>) {
-        val notesAdapter = NotesAdapter(this, notesSet)
-        rv_notes.adapter = notesAdapter
+        rv_notes.adapter = NotesAdapter(this, notesSet)
     }
 
     override fun startNewNoteActivity() {
