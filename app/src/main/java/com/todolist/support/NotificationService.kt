@@ -4,44 +4,49 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.preference.PreferenceManager
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.todolist.R
 import com.todolist.mvp.views.MainActivity
 
-
 private const val CHANNEL_ID = "1"
+private const val CHANNEL_NAME = "Notification's Channel"
 
 class NotificationService : Service() {
 
     private lateinit var preferences: SharedPreferences
     private lateinit var notificationManager: NotificationManager
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
-        if (preferences.getBoolean("haveNotificationChannel", false))
-            createNotificationChannel()
+        if (!preferences.getBoolean("haveNotificationChannel", false))
+            createNotificationChannel(notificationManager)
 
-        val noteId = intent.getIntExtra("noteId", 0)
-        val noteName = intent.getStringExtra("noteName")
-        Handler().postDelayed({
-            startNotification(noteId, noteName)
-        }, 5 * 1000)
-
-        return START_STICKY
+        return if (intent != null) {
+            Handler().postDelayed({
+                val noteId = intent.getIntExtra("noteId", 0)
+                val noteName = intent.getStringExtra("noteName")
+                val notification = getNotification(noteId, noteName)
+                notificationManager.notify(noteId, notification)
+            }, 5 * 1000)
+            START_STICKY
+        } else
+            START_NOT_STICKY
     }
 
-    private fun startNotification(noteId: Int, noteName: String) {
+    private fun getNotification(noteId: Int, noteName: String): Notification {
         val resultIntent = Intent(this, MainActivity::class.java)
-        val stackBuilder = TaskStackBuilder.create(this)
-        stackBuilder.addParentStack(MainActivity::class.java)
-        stackBuilder.addNextIntent(resultIntent)
+        val stackBuilder = TaskStackBuilder.create(this).apply {
+            addNextIntent(resultIntent)
+        }
         val resultPendingIntent =
-            stackBuilder.getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT)
+            stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val deleteIntent = Intent(this, ActionReceiver::class.java)
         deleteIntent.putExtra("noteId", noteId)
@@ -53,33 +58,41 @@ class NotificationService : Service() {
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
 
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(getString(R.string.note))
-            .setContentText(noteName.getSlicedText(20))
-            .setAutoCancel(true) // автозакрытие при тапе по уведомлению
-            .setContentIntent(resultPendingIntent)
-            .addAction(
+        return NotificationCompat.Builder(this, CHANNEL_ID).apply {
+            setSmallIcon(R.mipmap.ic_launcher)
+            setContentTitle(getString(R.string.note))
+            setContentText(noteName.getSlicedText(20))
+            setAutoCancel(true) // автозакрытие при тапе по уведомлению
+            setContentIntent(resultPendingIntent)
+            setCategory(NotificationCompat.CATEGORY_REMINDER)
+            addAction(
                 R.drawable.ic_action_add_note,
                 getString(R.string.complete_execute),
                 deletePendingIntent
             )
-
-        val notification = builder.build()
-        notificationManager.notify(noteId, notification)
+        }.build()
     }
 
-    private fun createNotificationChannel() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID, "Notification's Channel",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            notificationManager.createNotificationChannel(channel)
+    private fun createNotificationChannel(manager: NotificationManager) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel =
+                    NotificationChannel(
+                        CHANNEL_ID,
+                        CHANNEL_NAME,
+                        NotificationManager.IMPORTANCE_HIGH
+                    )
+                manager.createNotificationChannel(channel)
+            }
+            val editor = preferences.edit()
+            editor.putBoolean(
+                "haveNotificationChannel",
+                true
+            ) // указать, что канал создан или не нужен
+            editor.apply()
+        } catch (e: Exception) {
+            Log.e("Notification's Error", "Channel not created")
         }
-        val editor = preferences.edit()
-        editor.putBoolean("haveNotificationChannel", true) // указать, что канал создан или не нужен
-        editor.apply()
     }
 
     private fun String.getSlicedText(size: Int): String {
