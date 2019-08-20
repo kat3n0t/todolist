@@ -10,7 +10,6 @@ import com.todolist.interfaces.INoteView
 import com.todolist.mvp.presenters.EditNotePresenter
 import com.todolist.mvp.presenters.NewNotePresenter
 import kotlinx.android.synthetic.main.activity_note.*
-import java.lang.Exception
 
 class NoteActivity : AppCompatActivity(), INoteView {
 
@@ -53,8 +52,7 @@ class NoteActivity : AppCompatActivity(), INoteView {
         try {
             imageButton_notification.setImageResource(type)
             imageButton_notification.visibility = View.VISIBLE
-        }
-        catch(e: Exception) {
+        } catch (e: Exception) {
             imageButton_notification.visibility = View.GONE
         }
     }

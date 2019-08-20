@@ -6,7 +6,6 @@ import android.text.SpannableString
 import android.text.style.StrikethroughSpan
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.CheckBox
 import com.todolist.R
 import com.todolist.database.DBManager
@@ -33,7 +32,7 @@ class NotesPresenter(private var activity: MainActivity) : INotesPresenter {
         )
     }
 
-    fun onCreateMenu(menu: Menu) : Boolean {
+    override fun onCreateMenu(menu: Menu): Boolean {
         return if (dbManager.notesModel.getCompletedNotes().size > 0) {
             activity.menuInflater.inflate(R.menu.menu_main, menu)
             setSwitcherTitle(menu.findItem(R.id.item_action_completed))
