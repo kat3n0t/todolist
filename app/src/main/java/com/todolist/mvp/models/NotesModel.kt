@@ -24,6 +24,14 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
         db.close()
     }
 
+    override fun changeNotification(noteId: Int, isCompleted: Boolean) {
+        val contentValues = ContentValues()
+        contentValues.put(TABLE_NOTES_IS_COMPLETED, isCompleted)
+        val db = dbHelper.writableDatabase
+        db.update(TABLE_NOTES, contentValues, "$TABLE_NOTES_ID = $noteId", null)
+        db.close()
+    }
+
     override fun renameNote(note: Note, newName: String) {
         val contentValues = ContentValues()
         contentValues.put(TABLE_NOTES_TEXT, newName)
@@ -44,13 +52,14 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
             val query = "SELECT " +
                     "$TABLE_NOTES_ID, " +
                     "$TABLE_NOTES_TEXT, " +
-                    "$TABLE_NOTES_IS_COMPLETED " +
+                    "$TABLE_NOTES_IS_COMPLETED, " +
+                    "$TABLE_NOTES_HAVE_NOTIFICATION " +
                     "FROM $TABLE_NOTES " +
                     "WHERE $TABLE_NOTES_ID = $id;"
             val db = dbHelper.writableDatabase
             val c = db.rawQuery(query, null)
             if (c.moveToFirst()) {
-                note = Note(c.getInt(0), c.getString(1), c.getInt(2) > 0)
+                note = Note(c.getInt(0), c.getString(1), c.getInt(2) > 0, c.getInt(3) > 0)
             }
             c.close()
             db.close()
@@ -60,26 +69,22 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
     }
 
     override fun getNotes(haveCompletedNotes: Boolean): LinkedHashSet<Note> {
+        val query = getNotesQuery(haveCompletedNotes)
+        return getNotes(query)
+    }
+
+    private fun getNotesQuery(haveCompletedNotes: Boolean) : String {
         var query = "SELECT " +
                 "$TABLE_NOTES_ID, " +
                 "$TABLE_NOTES_TEXT, " +
-                "$TABLE_NOTES_IS_COMPLETED " +
+                "$TABLE_NOTES_IS_COMPLETED, " +
+                "$TABLE_NOTES_HAVE_NOTIFICATION " +
                 "FROM $TABLE_NOTES "
         query += if (haveCompletedNotes)
             "ORDER BY $TABLE_NOTES_IS_COMPLETED, $TABLE_NOTES_ID;" // Сперва по сортировке выдавать невыполненные задачи
         else
             "WHERE $TABLE_NOTES_IS_COMPLETED != 1;"
-        return getNotes(query)
-    }
-
-    override fun getCompletedNotes(): LinkedHashSet<Note> {
-        val query = "SELECT " +
-                "$TABLE_NOTES_ID, " +
-                "$TABLE_NOTES_TEXT, " +
-                "$TABLE_NOTES_IS_COMPLETED " +
-                "FROM $TABLE_NOTES " +
-                "WHERE $TABLE_NOTES_IS_COMPLETED = 1;"
-        return getNotes(query)
+        return query
     }
 
     private fun getNotes(query: String): LinkedHashSet<Note> {
@@ -92,7 +97,8 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
                     val id = c.getInt(0)
                     val name = c.getString(1)
                     val isCompleted = c.getInt(2) > 0
-                    val note = Note(id, name, isCompleted)
+                    val haveNotification = c.getInt(3) > 0
+                    val note = Note(id, name, isCompleted, haveNotification)
                     notes.add(note)
                 } while (c.moveToNext())
             }
@@ -101,5 +107,16 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
         } finally {
             return notes
         }
+    }
+
+    override fun getCompletedNotes(): LinkedHashSet<Note> {
+        val query = "SELECT " +
+                "$TABLE_NOTES_ID, " +
+                "$TABLE_NOTES_TEXT, " +
+                "$TABLE_NOTES_IS_COMPLETED, " +
+                "$TABLE_NOTES_HAVE_NOTIFICATION " +
+                "FROM $TABLE_NOTES " +
+                "WHERE $TABLE_NOTES_IS_COMPLETED = 1;"
+        return getNotes(query)
     }
 }

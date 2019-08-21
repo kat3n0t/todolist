@@ -40,7 +40,8 @@ class EditNotePresenter(private var activity: NoteActivity) : IEditNotePresenter
         if (noteId != null) {
             val note = dbManager.notesModel.getNote(noteId)
             if (note != null) {
-                val serviceIntent = Intent(activity.applicationContext, NotificationService::class.java)
+                val serviceIntent =
+                    Intent(activity.applicationContext, NotificationService::class.java)
                 serviceIntent.putExtra("noteId", note.id)
                 serviceIntent.putExtra("noteName", note.name)
                 if (isNotificationOn) {
@@ -67,17 +68,23 @@ class EditNotePresenter(private var activity: NoteActivity) : IEditNotePresenter
                 activity.setText(note.name)
         }
 
-        fun setNotificationButtonImage() {
-            // TODO : if (!service.active)
-            activity.setImageButtonType(R.drawable.ic_notifications_off)
+        fun setNotificationButtonImage(noteId: Int) {
+            val note = dbManager.notesModel.getNote(noteId)
+            if (note != null) {
+                if (note.haveNotification)
+                    activity.setImageButtonType(R.drawable.ic_notifications_on)
+                else
+                    activity.setImageButtonType(R.drawable.ic_notifications_off)
+            } else activity.setImageButtonType(R.drawable.ic_notifications_off)
         }
 
         activity.showDeleteButton(true)
-        setNotificationButtonImage()
 
         val noteId = activity.getEditingNoteId()
-        if (noteId != null)
+        if (noteId != null) {
             setTextNote(noteId)
+            setNotificationButtonImage(noteId)
+        }
     }
 
     override fun onDestroy() {

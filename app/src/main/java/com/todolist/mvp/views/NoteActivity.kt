@@ -1,6 +1,7 @@
 package com.todolist.mvp.views
 
 import android.os.Bundle
+import android.view.ContextMenu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.todolist.R
@@ -14,6 +15,10 @@ import kotlinx.android.synthetic.main.activity_note.*
 class NoteActivity : AppCompatActivity(), INoteView {
 
     private lateinit var notePresenter: INotePresenter
+
+    // Ресурс изображения с кнопки уведомления
+    // По умолчанию уведомление должно быть выключено
+    private var imageSource: Int = R.drawable.ic_notifications_off
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +55,8 @@ class NoteActivity : AppCompatActivity(), INoteView {
 
     override fun setImageButtonType(type: Int) {
         try {
-            imageButton_notification.setImageResource(type)
+            imageSource = type
+            imageButton_notification.setImageResource(imageSource)
             imageButton_notification.visibility = View.VISIBLE
         } catch (e: Exception) {
             imageButton_notification.visibility = View.GONE
@@ -70,11 +76,16 @@ class NoteActivity : AppCompatActivity(), INoteView {
             (notePresenter as? IEditNotePresenter)?.onDeleteClick()
         }
         imageButton_notification.setOnClickListener {
-            (notePresenter as? IEditNotePresenter)?.onNotificationClick(true) // TODO
+            (notePresenter as? IEditNotePresenter)?.onNotificationClick(imageSource == R.drawable.ic_notifications_off)
         }
     }
 
     override fun getNoteText(): String {
         return editText_note.text.toString()
+    }
+
+    override fun onDestroy() {
+        notePresenter.onDestroy()
+        super.onDestroy()
     }
 }
