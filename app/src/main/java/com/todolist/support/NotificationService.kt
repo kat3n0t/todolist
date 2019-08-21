@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
-import android.os.Handler
 import android.os.IBinder
 import android.preference.PreferenceManager
 import android.util.Log
@@ -29,12 +28,11 @@ class NotificationService : Service() {
             createNotificationChannel(notificationManager)
 
         return if (intent != null) {
-            Handler().postDelayed({
-                val noteId = intent.getIntExtra("noteId", 0)
-                val noteName = intent.getStringExtra("noteName")
-                val notification = getNotification(noteId, noteName)
-                notificationManager.notify(noteId, notification)
-            }, 5 * 1000)
+            val noteId = intent.getIntExtra("noteId", 0)
+            val noteName = intent.getStringExtra("noteName")
+            val notification = getNotification(noteId, noteName)
+            notificationManager.notify(noteId, notification)
+
             START_STICKY
         } else
             START_NOT_STICKY

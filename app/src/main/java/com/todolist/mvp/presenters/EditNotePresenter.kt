@@ -1,12 +1,15 @@
 package com.todolist.mvp.presenters
 
-import android.content.Intent
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.todolist.R
 import com.todolist.database.DBManager
 import com.todolist.interfaces.IEditNotePresenter
 import com.todolist.interfaces.INoteView
 import com.todolist.mvp.views.NoteActivity
-import com.todolist.support.NotificationService
+import com.todolist.support.NotificationWorker
+import java.util.concurrent.TimeUnit
 
 class EditNotePresenter(private var activity: NoteActivity) : IEditNotePresenter {
 
@@ -40,15 +43,18 @@ class EditNotePresenter(private var activity: NoteActivity) : IEditNotePresenter
         if (noteId != null) {
             val note = dbManager.notesModel.getNote(noteId)
             if (note != null) {
-                val serviceIntent =
-                    Intent(activity.applicationContext, NotificationService::class.java)
-                serviceIntent.putExtra("noteId", note.id)
-                serviceIntent.putExtra("noteName", note.name)
+                val data = Data.Builder()
+                data.putInt("note_id", note.id)
+
+                val uploadWorkRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
+                    .setInitialDelay(10, TimeUnit.SECONDS)
+                    .setInputData(data.build())
+                    .build()
                 if (isNotificationOn) {
-                    activity.startService(serviceIntent)
+                    WorkManager.getInstance(activity ).enqueue(uploadWorkRequest)
                     activity.setImageButtonType(R.drawable.ic_notifications_on)
                 } else {
-                    activity.stopService(serviceIntent)
+                    WorkManager.getInstance(activity).cancelWorkById(uploadWorkRequest.id)
                     activity.setImageButtonType(R.drawable.ic_notifications_off)
                 }
             }

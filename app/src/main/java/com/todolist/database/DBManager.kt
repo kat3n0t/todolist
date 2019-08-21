@@ -13,4 +13,3 @@ class DBManager(context : Context) {
         notesModel = NotesModel(dbHelper)
     }
 }
-
