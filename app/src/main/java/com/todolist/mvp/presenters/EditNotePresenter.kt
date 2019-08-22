@@ -52,10 +52,8 @@ class EditNotePresenter(private var activity: NoteActivity) : IEditNotePresenter
             .observe(activity, Observer { workInfo ->
                 if (workInfo != null) {
                     when (workInfo.state) {
-                        WorkInfo.State.SUCCEEDED, WorkInfo.State.FAILED -> activity.setImageButtonType(
-                            R.drawable.ic_notifications_off
-                        )
-                        else -> activity.setImageButtonType(R.drawable.ic_notifications_on)
+                        WorkInfo.State.ENQUEUED, WorkInfo.State.RUNNING -> activity.setImageButtonType(R.drawable.ic_notifications_on)
+                        else -> activity.setImageButtonType(R.drawable.ic_notifications_off)
                     }
                 }
             })
