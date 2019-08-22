@@ -23,7 +23,7 @@ const val CREATE_NEW_NOTE = 1
 class MainActivity : AppCompatActivity(), IMainView {
 
     private lateinit var presenter: NotesPresenter
-
+    private var completedMenuItem : MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,8 +42,7 @@ class MainActivity : AppCompatActivity(), IMainView {
     }
 
     override fun fillRecyclerView(notesSet: LinkedHashSet<Note>) {
-        val notesAdapter = NotesAdapter(this, notesSet)
-        rv_notes.adapter = notesAdapter
+        rv_notes.adapter = NotesAdapter(this, notesSet)
     }
 
     override fun startNewNoteActivity() {
@@ -61,11 +60,19 @@ class MainActivity : AppCompatActivity(), IMainView {
         startActivity(intent)
     }
 
+    override fun setCompletedMenuItem(item : MenuItem) {
+        completedMenuItem = item
+    }
+
     override fun showProgressBar(isShow: Boolean) {
         if (isShow)
             progressBar_load_items.visibility = View.VISIBLE
         else
             progressBar_load_items.visibility = View.GONE
+    }
+
+    override fun setOptionsMenuVisible(haveCompleted: Boolean) {
+        completedMenuItem?.isVisible = haveCompleted
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
