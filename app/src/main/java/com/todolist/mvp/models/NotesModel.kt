@@ -4,45 +4,63 @@ import android.content.ContentValues
 import com.todolist.database.*
 import com.todolist.interfaces.INotesModel
 import com.todolist.support.Note
+import java.util.*
+import kotlin.collections.LinkedHashSet
 
 class NotesModel(private val dbHelper: DBHelper) : INotesModel {
 
     override fun addNote(name: String) {
         val values = ContentValues()
-        values.put(TABLE_NOTES_TEXT, name)
+        values.put(NOTES_COLUMN_TEXT, name)
 
         val db = dbHelper.writableDatabase
-        db.insert(TABLE_NOTES, null, values)
+        db.insert(NOTES_TABLE, null, values)
+        db.close()
+    }
+
+    override fun addWorkersGuid(noteId: Int, guid: UUID) {
+        val values = ContentValues()
+        values.put(WORKERS_NOTE_ID, noteId)
+        values.put(WORKERS_GUID, guid.toString())
+
+        val db = dbHelper.writableDatabase
+        db.insert(WORKERS_TABLE, null, values)
         db.close()
     }
 
     override fun changeCompleted(note: Note, isCompleted: Boolean) {
         val contentValues = ContentValues()
-        contentValues.put(TABLE_NOTES_IS_COMPLETED, isCompleted)
+        contentValues.put(NOTES_COLUMN_IS_COMPLETED, isCompleted)
         val db = dbHelper.writableDatabase
-        db.update(TABLE_NOTES, contentValues, "$TABLE_NOTES_ID = ${note.id}", null)
+        db.update(NOTES_TABLE, contentValues, "$NOTES_COLUMN_ID = ${note.id}", null)
         db.close()
     }
 
     override fun changeNotification(noteId: Int, isCompleted: Boolean) {
         val contentValues = ContentValues()
-        contentValues.put(TABLE_NOTES_IS_COMPLETED, isCompleted)
+        contentValues.put(NOTES_COLUMN_IS_COMPLETED, isCompleted)
         val db = dbHelper.writableDatabase
-        db.update(TABLE_NOTES, contentValues, "$TABLE_NOTES_ID = $noteId", null)
+        db.update(NOTES_TABLE, contentValues, "$NOTES_COLUMN_ID = $noteId", null)
         db.close()
     }
 
     override fun renameNote(note: Note, newName: String) {
         val contentValues = ContentValues()
-        contentValues.put(TABLE_NOTES_TEXT, newName)
+        contentValues.put(NOTES_COLUMN_TEXT, newName)
         val db = dbHelper.writableDatabase
-        db.update(TABLE_NOTES, contentValues, "$TABLE_NOTES_ID = ${note.id}", null)
+        db.update(NOTES_TABLE, contentValues, "$NOTES_COLUMN_ID = ${note.id}", null)
         db.close()
     }
 
     override fun removeNote(note: Note) {
         val db = dbHelper.writableDatabase
-        db.delete(TABLE_NOTES, "$TABLE_NOTES_ID = ${note.id}", null)
+        db.delete(NOTES_TABLE, "$NOTES_COLUMN_ID = ${note.id}", null)
+        db.close()
+    }
+
+    override fun removeWorkersGuid(note: Note) {
+        val db = dbHelper.writableDatabase
+        db.delete(WORKERS_TABLE, "$WORKERS_NOTE_ID = ${note.id}", null)
         db.close()
     }
 
@@ -50,16 +68,15 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
         var note: Note? = null
         try {
             val query = "SELECT " +
-                    "$TABLE_NOTES_ID, " +
-                    "$TABLE_NOTES_TEXT, " +
-                    "$TABLE_NOTES_IS_COMPLETED, " +
-                    "$TABLE_NOTES_HAVE_NOTIFICATION " +
-                    "FROM $TABLE_NOTES " +
-                    "WHERE $TABLE_NOTES_ID = $id;"
+                    "$NOTES_COLUMN_ID, " +
+                    "$NOTES_COLUMN_TEXT, " +
+                    "$NOTES_COLUMN_IS_COMPLETED " +
+                    "FROM $NOTES_TABLE " +
+                    "WHERE $NOTES_COLUMN_ID = $id;"
             val db = dbHelper.writableDatabase
             val c = db.rawQuery(query, null)
             if (c.moveToFirst()) {
-                note = Note(c.getInt(0), c.getString(1), c.getInt(2) > 0, c.getInt(3) > 0)
+                note = Note(c.getInt(0), c.getString(1), c.getInt(2) > 0)
             }
             c.close()
             db.close()
@@ -73,20 +90,18 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
         return getNotes(query)
     }
 
-    private fun getNotesQuery(haveCompletedNotes: Boolean) : String {
+    private fun getNotesQuery(haveCompletedNotes: Boolean): String {
         var query = "SELECT " +
-                "$TABLE_NOTES_ID, " +
-                "$TABLE_NOTES_TEXT, " +
-                "$TABLE_NOTES_IS_COMPLETED, " +
-                "$TABLE_NOTES_HAVE_NOTIFICATION " +
-                "FROM $TABLE_NOTES "
+                "$NOTES_COLUMN_ID, " +
+                "$NOTES_COLUMN_TEXT, " +
+                "$NOTES_COLUMN_IS_COMPLETED " +
+                "FROM $NOTES_TABLE "
         query += if (haveCompletedNotes)
-            "ORDER BY $TABLE_NOTES_IS_COMPLETED, $TABLE_NOTES_ID;" // Сперва по сортировке выдавать невыполненные задачи
+            "ORDER BY $NOTES_COLUMN_IS_COMPLETED, $NOTES_COLUMN_ID;" // Сперва по сортировке выдавать невыполненные задачи
         else
-            "WHERE $TABLE_NOTES_IS_COMPLETED != 1;"
+            "WHERE $NOTES_COLUMN_IS_COMPLETED != 1;"
         return query
     }
-
     private fun getNotes(query: String): LinkedHashSet<Note> {
         val notes = LinkedHashSet<Note>()
         try {
@@ -97,8 +112,7 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
                     val id = c.getInt(0)
                     val name = c.getString(1)
                     val isCompleted = c.getInt(2) > 0
-                    val haveNotification = c.getInt(3) > 0
-                    val note = Note(id, name, isCompleted, haveNotification)
+                    val note = Note(id, name, isCompleted)
                     notes.add(note)
                 } while (c.moveToNext())
             }
@@ -111,12 +125,30 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
 
     override fun getCompletedNotes(): LinkedHashSet<Note> {
         val query = "SELECT " +
-                "$TABLE_NOTES_ID, " +
-                "$TABLE_NOTES_TEXT, " +
-                "$TABLE_NOTES_IS_COMPLETED, " +
-                "$TABLE_NOTES_HAVE_NOTIFICATION " +
-                "FROM $TABLE_NOTES " +
-                "WHERE $TABLE_NOTES_IS_COMPLETED = 1;"
+                "$NOTES_COLUMN_ID, " +
+                "$NOTES_COLUMN_TEXT, " +
+                "$NOTES_COLUMN_IS_COMPLETED " +
+                "FROM $NOTES_TABLE " +
+                "WHERE $NOTES_COLUMN_IS_COMPLETED = 1;"
         return getNotes(query)
+    }
+
+    override fun getWorkersGuid(noteId: Int): UUID? {
+        val query = "SELECT " +
+                "$WORKERS_GUID " +
+                "FROM $WORKERS_TABLE " +
+                "WHERE $WORKERS_NOTE_ID = $noteId;"
+        var guid: UUID? = null
+        try {
+            val db = dbHelper.readableDatabase
+            val c = db.rawQuery(query, null)
+            if (c.moveToFirst()) {
+                guid = UUID.fromString(c.getString(0))
+            }
+            c.close()
+            db.close()
+        } finally {
+            return guid
+        }
     }
 }

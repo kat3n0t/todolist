@@ -8,15 +8,17 @@ import com.todolist.database.DBManager
 
 class NotificationWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
     override fun doWork(): Result {
+        val dbManager = DBManager(applicationContext)
 
-        val noteId =  inputData.getInt("note_id", 0)
-        val note = DBManager(applicationContext).notesModel.getNote(noteId)
+        val note = dbManager.notesModel.getNote(inputData.getInt("note_id", 0))
         return if (note != null) {
             val serviceIntent =
                 Intent(applicationContext, NotificationService::class.java)
             serviceIntent.putExtra("noteId", note.id)
             serviceIntent.putExtra("noteName", note.name)
             applicationContext.startService(serviceIntent)
+
+            dbManager.notesModel.removeWorkersGuid(note) // удаление guid по завершению воркера
 
             Result.success()
         } else
