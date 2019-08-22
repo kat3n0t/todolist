@@ -12,6 +12,7 @@ import com.todolist.database.DBManager
 import com.todolist.interfaces.INotesPresenter
 import com.todolist.mvp.views.MainActivity
 import com.todolist.support.Note
+import com.todolist.support.NotesAdapter
 
 
 class NotesPresenter(private var activity: MainActivity) : INotesPresenter {
@@ -52,23 +53,10 @@ class NotesPresenter(private var activity: MainActivity) : INotesPresenter {
         activity.fillRecyclerView(notes)
     }
 
-    override fun onItemClicked(checkBox: CheckBox, note: Note, isChecked: Boolean) {
+    override fun onItemClicked(holder: NotesAdapter.NotesViewHolder, note: Note, isChecked: Boolean) {
         dbManager.notesModel.changeCompleted(note, isChecked)
+        holder.setCheckBoxCompleted(note, isChecked)
         activity.setOptionsMenuVisible(dbManager.notesModel.haveCompletedNotes())
-        setCheckBoxCompleted(checkBox, note, isChecked)
-    }
-
-    private fun setCheckBoxCompleted(checkBox: CheckBox, note: Note, isCompleted: Boolean) {
-        if (isCompleted) {
-            checkBox.alpha = 0.5f // делает элемент полупрозрачным
-
-            val spannableString = SpannableString(note.name)
-            spannableString.setSpan(StrikethroughSpan(), 0, spannableString.length, 0)
-            checkBox.text = spannableString // перечеркивает текст заметки
-        } else {
-            checkBox.text = note.name
-            checkBox.alpha = 1.0f
-        }
     }
 
     override fun onItemLongClicked(checkBox: CheckBox, note: Note) {

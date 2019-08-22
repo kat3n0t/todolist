@@ -1,6 +1,8 @@
 package com.todolist.support
 
 import android.content.Context
+import android.text.SpannableString
+import android.text.style.StrikethroughSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +13,7 @@ import com.todolist.interfaces.INotesPresenter
 import com.todolist.mvp.presenters.NotesPresenter
 import com.todolist.mvp.views.MainActivity
 
-class NotesAdapter(private val context: Context, private val notesSet: LinkedHashSet<Note>) :
+class NotesAdapter(private val context: Context, private var notesSet: LinkedHashSet<Note>) :
     RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
@@ -21,7 +23,7 @@ class NotesAdapter(private val context: Context, private val notesSet: LinkedHas
     }
 
     override fun getItemCount(): Int {
-        return notesSet.size
+        return notesSet.count()
     }
 
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
@@ -34,22 +36,59 @@ class NotesAdapter(private val context: Context, private val notesSet: LinkedHas
         private val listItemNoteView: CheckBox = itemView.findViewById(R.id.checkBox_note)
 
         fun bind(note: Note) {
-            setItemStyle(listItemNoteView, note)
-
             listItemNoteView.setOnLongClickListener {
                 presenter.onItemLongClicked(listItemNoteView, note)
                 true
             }
+            setItemStyle(listItemNoteView, note)
         }
 
         private fun setItemStyle(itemView: CheckBox, note: Note) {
             itemView.text = note.name
 
-            itemView.setOnCheckedChangeListener { _, isChecked ->
-                presenter.onItemClicked(itemView, note, isChecked)
-            }
-
             itemView.isChecked = note.isCompleted
+            setCheckBoxCompleted(note, note.isCompleted) // предварительное обновление
+
+            itemView.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    moveDown(note)
+                else
+                    moveUp(note)
+                presenter.onItemClicked(this, note, isChecked)
+            }
+        }
+
+        private fun moveUp(note: Note) {
+            layoutPosition.takeIf { it > 0 }?.also { currentPosition ->
+                val newSet = LinkedHashSet<Note>()
+                newSet.add(note)
+                notesSet.remove(note)
+                newSet.addAll(notesSet)
+                notesSet = newSet
+                notifyItemMoved(currentPosition, 0)
+            }
+        }
+
+        private fun moveDown(note: Note) {
+            layoutPosition.takeIf { it < itemCount - 1 }?.also { currentPosition ->
+                notesSet.remove(note).also {
+                    notesSet.add(note)
+                }
+                notifyItemMoved(currentPosition, itemCount - 1)
+            }
+        }
+
+        fun setCheckBoxCompleted(note: Note, isCompleted: Boolean) {
+            if (isCompleted) {
+                listItemNoteView.alpha = 0.5f // делает элемент полупрозрачным
+
+                val spannableString = SpannableString(note.name)
+                spannableString.setSpan(StrikethroughSpan(), 0, spannableString.length, 0)
+                listItemNoteView.text = spannableString // перечеркивает текст заметки
+            } else {
+                listItemNoteView.text = note.name
+                listItemNoteView.alpha = 1.0f
+            }
         }
     }
 }
