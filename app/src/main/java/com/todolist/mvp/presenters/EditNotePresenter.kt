@@ -94,7 +94,7 @@ class EditNotePresenter(private var activity: NoteActivity) : IEditNotePresenter
                 data.putInt("note_id", note.id)
 
                 val oneTimeWorkRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
-                    .setInitialDelay(10, TimeUnit.SECONDS)
+                    .setInitialDelay(10, TimeUnit.MINUTES)
                     .setInputData(data.build())
                     .build()
                 dbManager.notesModel.addWorkersGuid(note.id, oneTimeWorkRequest.id)
