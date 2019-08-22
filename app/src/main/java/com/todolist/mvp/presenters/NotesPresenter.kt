@@ -35,7 +35,7 @@ class NotesPresenter(private var activity: MainActivity) : INotesPresenter {
     override fun onCreateMenu(menu: Menu): Boolean {
         activity.menuInflater.inflate(R.menu.menu_main, menu)
         setSwitcherTitle(menu.findItem(R.id.item_action_completed))
-        activity.completedMenuButton = menu.findItem(R.id.item_action_completed)
+        activity.setCompletedMenuItem(menu.findItem(R.id.item_action_completed))
         activity.setOptionsMenuVisible(dbManager.notesModel.haveCompletedNotes())
         return true
     }

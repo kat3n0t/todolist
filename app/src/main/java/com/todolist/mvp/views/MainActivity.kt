@@ -23,7 +23,7 @@ const val CREATE_NEW_NOTE = 1
 class MainActivity : AppCompatActivity(), IMainView {
 
     private lateinit var presenter: NotesPresenter
-    var completedMenuButton : MenuItem? = null
+    private var completedMenuItem : MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +60,10 @@ class MainActivity : AppCompatActivity(), IMainView {
         startActivity(intent)
     }
 
+    override fun setCompletedMenuItem(item : MenuItem) {
+        completedMenuItem = item
+    }
+
     override fun showProgressBar(isShow: Boolean) {
         if (isShow)
             progressBar_load_items.visibility = View.VISIBLE
@@ -67,8 +71,8 @@ class MainActivity : AppCompatActivity(), IMainView {
             progressBar_load_items.visibility = View.GONE
     }
 
-    fun setOptionsMenuVisible(haveCompleted: Boolean) {
-        completedMenuButton?.isVisible = haveCompleted
+    override fun setOptionsMenuVisible(haveCompleted: Boolean) {
+        completedMenuItem?.isVisible = haveCompleted
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
