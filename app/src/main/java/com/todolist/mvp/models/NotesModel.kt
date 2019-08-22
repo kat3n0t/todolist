@@ -44,6 +44,10 @@ class NotesModel(private val dbHelper: DBHelper) : INotesModel {
         db.close()
     }
 
+    override fun haveCompletedNotes(): Boolean {
+        return getCompletedNotes().size > 0
+    }
+
     override fun renameNote(note: Note, newName: String) {
         val contentValues = ContentValues()
         contentValues.put(NOTES_COLUMN_TEXT, newName)

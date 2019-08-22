@@ -13,6 +13,7 @@ interface INotesModel {
     fun getCompletedNotes() : LinkedHashSet<Note>
     fun getNotes(haveCompletedNotes: Boolean): LinkedHashSet<Note>
     fun getWorkersGuid(noteId: Int) : UUID?
+    fun haveCompletedNotes(): Boolean
     fun renameNote(note: Note, newName : String)
     fun removeNote(note: Note)
     fun removeWorkersGuid(note: Note)

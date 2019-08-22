@@ -33,12 +33,11 @@ class NotesPresenter(private var activity: MainActivity) : INotesPresenter {
     }
 
     override fun onCreateMenu(menu: Menu): Boolean {
-        return if (dbManager.notesModel.getCompletedNotes().size > 0) {
-            activity.menuInflater.inflate(R.menu.menu_main, menu)
-            setSwitcherTitle(menu.findItem(R.id.item_action_completed))
-            true
-        } else
-            false
+        activity.menuInflater.inflate(R.menu.menu_main, menu)
+        setSwitcherTitle(menu.findItem(R.id.item_action_completed))
+        activity.completedMenuButton = menu.findItem(R.id.item_action_completed)
+        activity.setOptionsMenuVisible(dbManager.notesModel.haveCompletedNotes())
+        return true
     }
 
     private fun setSwitcherTitle(item: MenuItem) {
@@ -55,6 +54,7 @@ class NotesPresenter(private var activity: MainActivity) : INotesPresenter {
 
     override fun onItemClicked(checkBox: CheckBox, note: Note, isChecked: Boolean) {
         dbManager.notesModel.changeCompleted(note, isChecked)
+        activity.setOptionsMenuVisible(dbManager.notesModel.haveCompletedNotes())
         setCheckBoxCompleted(checkBox, note, isChecked)
     }
 
