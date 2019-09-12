@@ -8,6 +8,5 @@ interface IMainView {
     fun startEditNoteActivity(note: Note)
     fun setCompletedMenuItem(item : MenuItem)
     fun setOptionsMenuVisible(haveCompleted: Boolean)
-    fun showProgressBar(isShow: Boolean)
     fun fillRecyclerView(notesSet: LinkedHashSet<Note>)
 }

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.todolist.R
 import com.todolist.interfaces.IMainView
@@ -62,13 +61,6 @@ class MainActivity : AppCompatActivity(), IMainView {
 
     override fun setCompletedMenuItem(item : MenuItem) {
         completedMenuItem = item
-    }
-
-    override fun showProgressBar(isShow: Boolean) {
-        if (isShow)
-            progressBar_load_items.visibility = View.VISIBLE
-        else
-            progressBar_load_items.visibility = View.GONE
     }
 
     override fun setOptionsMenuVisible(haveCompleted: Boolean) {

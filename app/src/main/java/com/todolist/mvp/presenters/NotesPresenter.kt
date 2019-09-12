@@ -23,14 +23,9 @@ class NotesPresenter(private var activity: MainActivity) : INotesPresenter {
     private var isShow = preferenceManager.getBoolean("isShowCompletedNotes", true)
 
     override fun onStart() {
-        activity.showProgressBar(true)
-        Handler().postDelayed(
-            {
-                loadNotes()
-                activity.showProgressBar(false)
-            },
-            1000
-        )
+        Handler().post {
+            loadNotes()
+        }
     }
 
     override fun onCreateMenu(menu: Menu): Boolean {
