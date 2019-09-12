@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.todolist.mvp.views.MainActivity">
+    tools:context=".mvp.views.MainActivity">
     <item
         android:id="@+id/item_action_completed"
         android:title="@string/action_hide_completed"
