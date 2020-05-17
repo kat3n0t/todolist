@@ -7,6 +7,7 @@
 
     <ImageButton
         android:id="@+id/ib_notification"
+        style="@style/AppTheme.ImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/ll"
@@ -38,27 +39,26 @@
 
         <LinearLayout
             android:id="@+id/ll_buttonsBar"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btn_save"
-                style="?android:attr/buttonBarButtonStyle"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="16dp"
                 android:layout_weight="0.5"
                 android:text="@string/save" />
 
             <Button
                 android:id="@+id/btn_delete"
-                style="?android:attr/buttonBarButtonStyle"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="16dp"
                 android:layout_weight="0.5"
                 android:text="@string/delete" />
         </LinearLayout>
