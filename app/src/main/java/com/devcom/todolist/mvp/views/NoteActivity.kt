@@ -17,7 +17,7 @@ class NoteActivity : AppCompatActivity(), INoteView {
 
     // Ресурс изображения с кнопки уведомления
     // По умолчанию уведомление должно быть выключено
-    private var imageSource: Int = R.drawable.ic_notifications_off
+    private var imageSource: Int = R.drawable.ic_notifications_off_black_24dp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +75,8 @@ class NoteActivity : AppCompatActivity(), INoteView {
             (notePresenter as? IEditNotePresenter)?.onDeleteClick()
         }
         ib_notification.setOnClickListener {
-            (notePresenter as? IEditNotePresenter)?.onNotificationClick(imageSource == R.drawable.ic_notifications_off)
+            (notePresenter as? IEditNotePresenter)?.onNotificationClick(
+                imageSource == R.drawable.ic_notifications_off_black_24dp)
         }
     }
 
