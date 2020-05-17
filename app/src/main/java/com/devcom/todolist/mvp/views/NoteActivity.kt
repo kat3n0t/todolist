@@ -17,7 +17,7 @@ class NoteActivity : AppCompatActivity(), INoteView {
 
     // Ресурс изображения с кнопки уведомления
     // По умолчанию уведомление должно быть выключено
-    private var imageSource: Int = R.drawable.ic_notifications_off
+    private var imageSource: Int = R.drawable.ic_notifications_off_black_24dp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,16 +49,16 @@ class NoteActivity : AppCompatActivity(), INoteView {
     }
 
     override fun setText(text: String) {
-        editText_note.setText(text)
+        et_note.setText(text)
     }
 
     override fun setImageButtonType(type: Int) {
         try {
             imageSource = type
-            imageButton_notification.setImageResource(imageSource)
-            imageButton_notification.visibility = View.VISIBLE
+            ib_notification.setImageResource(imageSource)
+            ib_notification.visibility = View.VISIBLE
         } catch (e: Exception) {
-            imageButton_notification.visibility = View.GONE
+            ib_notification.visibility = View.GONE
         }
     }
 
@@ -74,13 +74,14 @@ class NoteActivity : AppCompatActivity(), INoteView {
         btn_delete.setOnClickListener {
             (notePresenter as? IEditNotePresenter)?.onDeleteClick()
         }
-        imageButton_notification.setOnClickListener {
-            (notePresenter as? IEditNotePresenter)?.onNotificationClick(imageSource == R.drawable.ic_notifications_off)
+        ib_notification.setOnClickListener {
+            (notePresenter as? IEditNotePresenter)?.onNotificationClick(
+                imageSource == R.drawable.ic_notifications_off_black_24dp)
         }
     }
 
     override fun getNoteText(): String {
-        return editText_note.text.toString()
+        return et_note.text.toString()
     }
 
     override fun onDestroy() {

@@ -22,14 +22,15 @@
         <activity
             android:name=".mvp.views.NoteActivity"
             android:label="@string/note"
-            android:parentActivityName=".mvp.views.MainActivity">
+            android:parentActivityName=".mvp.views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".mvp.views.MainActivity" />
         </activity>
 
         <service android:name=".support.NotificationService" />
-        <receiver android:name=".support.ActionReceiver"/>
+        <receiver android:name=".support.ActionReceiver" />
     </application>
 
 </manifest>

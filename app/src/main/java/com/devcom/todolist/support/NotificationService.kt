@@ -64,7 +64,7 @@ class NotificationService : Service() {
             setContentIntent(resultPendingIntent)
             setCategory(NotificationCompat.CATEGORY_REMINDER)
             addAction(
-                R.drawable.ic_action_add_note,
+                R.drawable.ic_note_add_primary_24dp,
                 getString(R.string.complete_execute),
                 deletePendingIntent
             )

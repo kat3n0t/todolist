@@ -30,10 +30,10 @@ class EditNotePresenter(private var activity: NoteActivity) : IEditNotePresenter
         fun setNotification(note: Note) {
             val guid = dbManager.notesModel.getWorkersGuid(note.id)
             if (guid != null) {
-                activity.setImageButtonType(R.drawable.ic_notifications_on)
+                activity.setImageButtonType(R.drawable.ic_notifications_active_black_24dp)
                 setWorkManagerLiveData(WorkManager.getInstance(this.activity), guid)
             } else
-                activity.setImageButtonType(R.drawable.ic_notifications_off)
+                activity.setImageButtonType(R.drawable.ic_notifications_off_black_24dp)
         }
 
         activity.showDeleteButton(true)
@@ -52,8 +52,8 @@ class EditNotePresenter(private var activity: NoteActivity) : IEditNotePresenter
             .observe(activity, Observer { workInfo ->
                 if (workInfo != null) {
                     when (workInfo.state) {
-                        WorkInfo.State.ENQUEUED, WorkInfo.State.RUNNING -> activity.setImageButtonType(R.drawable.ic_notifications_on)
-                        else -> activity.setImageButtonType(R.drawable.ic_notifications_off)
+                        WorkInfo.State.ENQUEUED, WorkInfo.State.RUNNING -> activity.setImageButtonType(R.drawable.ic_notifications_active_black_24dp)
+                        else -> activity.setImageButtonType(R.drawable.ic_notifications_off_black_24dp)
                     }
                 }
             })
@@ -104,7 +104,7 @@ class EditNotePresenter(private var activity: NoteActivity) : IEditNotePresenter
                         .cancelWorkById(it)
                     dbManager.notesModel.removeWorkersGuid(note)
                 }
-                activity.setImageButtonType(R.drawable.ic_notifications_off)
+                activity.setImageButtonType(R.drawable.ic_notifications_off_black_24dp)
             }
         }
     }
