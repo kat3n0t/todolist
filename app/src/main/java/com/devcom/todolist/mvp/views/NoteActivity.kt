@@ -49,16 +49,16 @@ class NoteActivity : AppCompatActivity(), INoteView {
     }
 
     override fun setText(text: String) {
-        editText_note.setText(text)
+        et_note.setText(text)
     }
 
     override fun setImageButtonType(type: Int) {
         try {
             imageSource = type
-            imageButton_notification.setImageResource(imageSource)
-            imageButton_notification.visibility = View.VISIBLE
+            ib_notification.setImageResource(imageSource)
+            ib_notification.visibility = View.VISIBLE
         } catch (e: Exception) {
-            imageButton_notification.visibility = View.GONE
+            ib_notification.visibility = View.GONE
         }
     }
 
@@ -74,13 +74,13 @@ class NoteActivity : AppCompatActivity(), INoteView {
         btn_delete.setOnClickListener {
             (notePresenter as? IEditNotePresenter)?.onDeleteClick()
         }
-        imageButton_notification.setOnClickListener {
+        ib_notification.setOnClickListener {
             (notePresenter as? IEditNotePresenter)?.onNotificationClick(imageSource == R.drawable.ic_notifications_off)
         }
     }
 
     override fun getNoteText(): String {
-        return editText_note.text.toString()
+        return et_note.text.toString()
     }
 
     override fun onDestroy() {
