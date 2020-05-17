@@ -30,7 +30,7 @@
         </activity>
 
         <service android:name=".support.NotificationService" />
-        <receiver android:name=".support.ActionReceiver"/>
+        <receiver android:name=".support.ActionReceiver" />
     </application>
 
 </manifest>
